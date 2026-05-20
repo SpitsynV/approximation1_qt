@@ -17,7 +17,24 @@ Approximator::Approximator(double a, double b, int n, int k)
     m_coef1.resize(m_deg, 0.0);
     initGrid();
 }
+double Approximator::getIntegralError() const
+{
+    if (m_n > 50) return -1.0;
+    // Передаём нашу функцию exactFunc = this->f
+    return integralError(m_a, m_b, m_n,
+                         [this](double x) { return this->f(x); },
+                         GetValue,
+                         m_coef1, m_deg);
+}
 
+double Approximator::getDiscreteError() const
+{
+    if (m_n > 50) return -1.0;
+    return discreteError(m_x, m_f, m_a, m_b, m_n,
+                         [this](double x) { return this->f(x); },
+                         GetValue,
+                         m_coef1, m_deg);
+}
 void Approximator::setN(int n)
 {
     m_n = n;
@@ -74,20 +91,7 @@ void Approximator::initGrid()
         m_f[mid] += m_p * 0.1 * m_maxAbsF;
     }
 }
-double Approximator::getIntegralError() const
-{
-    // Если n > 50, метод 1 не строится – возвращаем 0 или большое число?
-    // По заданию при n>50 приближение не строится, так что ошибку считать не нужно.
-    // Вернём -1 как индикатор.
-    //if (m_n > 50) return -1.0;
-    return integralError(m_a, m_b, m_n, m_k, m_coef1, m_deg);
-}
 
-double Approximator::getDiscreteError() const
-{
-    //if (m_n > 50) return -1.0;
-    return discreteError(m_x, m_f, m_a, m_b, m_n, m_coef1, m_deg);
-}
 void Approximator::rebuild()
 {
     initGrid();
