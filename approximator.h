@@ -5,12 +5,13 @@
 #include <functional>
 #include <QString>
 #include <QColor>
-
+#include "error.h"
 class Approximator
 {
 public:
     Approximator(double a, double b, int n, int k);
-
+    double getIntegralError() const;
+    double getDiscreteError() const;
     // Пересчитать всё при изменении параметров
     void rebuild();
 

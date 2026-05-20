@@ -5,9 +5,9 @@
 #include <cstdio>
 
 PlotWidget::PlotWidget(Approximator *approx, QWidget *parent)
-    : QWidget(parent), m_approx(approx)
+    : QWidget(parent), m_approx(approx), m_lastMaxAbs(-1.0)
 {
-    setFocusPolicy(Qt::StrongFocus); // чтобы принимать клавиши
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 QSize PlotWidget::minimumSizeHint() const
@@ -67,16 +67,30 @@ void PlotWidget::paintEvent(QPaintEvent * /*event*/)
         }
     }
     if (first) return; // нет конечных значений
+        // Реальные min/max функций (до отступов)
+    double realMin = minY;
+    double realMax = maxY;
 
-    // Добавим 5% отступа по Y
-    double margin = (maxY - minY) * 0.05;
-    if (margin == 0.0) margin = 1.0;
-    minY -= margin;
-    maxY += margin;
+    // Вычисляем maxAbs по заданию (максимум модуля среди реальных min/max)
+    double maxAbs = std::max(std::abs(realMin), std::abs(realMax));
+
+    // Добавляем отступы, чтобы график не прилипал к краям
+    double delta = realMax - realMin;
+    double margin;
+    if (delta < 1e-12) {
+        // Константная функция – отступ 10% от абсолютного значения, но не меньше 0.1
+        margin = 0.1 * std::max(1.0, std::abs(realMax));
+    } else {
+        margin = 0.05 * delta; // 5% от диапазона
+    }
+    minY = realMin - margin;
+    maxY = realMax + margin;
 
     // Вывод в консоль максимального по модулю значения
-    double maxAbs = std::max(std::abs(minY), std::abs(maxY));
+    if (std::abs(maxAbs - m_lastMaxAbs) > 1e-16 || m_lastMaxAbs < 0) {
     fprintf(stderr, "max|F| = %g\n", maxAbs);
+    m_lastMaxAbs = maxAbs;
+}
 
     // Функция преобразования логических координат в экранные
     auto l2g = [&](double x, double y) -> QPointF {
@@ -219,6 +233,9 @@ void PlotWidget::keyPressEvent(QKeyEvent *event)
 
     if (needRebuild)
         m_approx->rebuild();
+        double errInt = m_approx->getIntegralError();
+        double errDisc = m_approx->getDiscreteError();
+        fprintf(stderr, "Integral error = %e, Discrete error = %e\n", errInt, errDisc);
     if (needUpdate)
         update();
 }

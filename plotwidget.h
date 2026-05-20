@@ -22,7 +22,7 @@ protected:
 
 private:
     Approximator *m_approx;
-
+    double m_lastMaxAbs; // для подавления повторного вывода
     void updateScaleAndDraw();
 };
 
