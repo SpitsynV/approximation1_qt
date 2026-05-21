@@ -31,6 +31,7 @@ inline double GetExactValue(double x, int k){
     }
 
 }
+double SecondDerivative(double x, int k);
 void printVector(const std::vector<double>& vec, int m);
 void initialize(std::vector<double>&x, std::vector<double>&f, int n, int k, double a, double b);
 #endif

@@ -184,6 +184,17 @@ void PlotWidget::keyPressEvent(QKeyEvent *event)
     bool needUpdate = true;
 
     switch (event->key()) {
+    case Qt::Key_D:
+    {
+    const auto &x = m_approx->getX();
+    const auto &f = m_approx->getF();
+    fprintf(stderr, "=== Debug: n=%d, a=%.6f, b=%.6f ===\n", m_approx->n(), m_approx->a(), m_approx->b());
+    for (int i = 0; i < m_approx->n(); ++i) {
+        fprintf(stderr, "x[%d] = %12.8f, f[%d] = %12.8f\n", i, x[i], i, f[i]);
+    }
+    // не меняем состояние и не перерисовываем
+    return;
+    }
     case Qt::Key_0:
         m_approx->nextK();
         needRebuild = true;

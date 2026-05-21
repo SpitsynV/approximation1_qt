@@ -12,7 +12,9 @@ add_executable(ApproximationPlot
     approximator.h approximator.cpp
     func.h func.cpp
     task1.h task1.cpp
-    error.h error.cpp  # если 
+    error.h error.cpp
+    task2.h
+    task2.cpp  # если 
 )
 
 target_link_libraries(ApproximationPlot PRIVATE Qt5::Widgets)

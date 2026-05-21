@@ -3,7 +3,8 @@
 
 #include "approximator.h"
 #include "func.h"        
-#include "task1.h"       
+#include "task1.h"     
+#include "task2.h"  
 #include <cmath>
 #include <algorithm>
 #include <qcolor.h>
@@ -11,15 +12,16 @@
 Approximator::Approximator(double a, double b, int n, int k)
     : m_a(a), m_b(b), m_n(n), m_k(k), m_p(0), m_scale(0), m_graphMode(0)
 {
-    m_deg = std::min(m_n, 50); // ограничение по заданию
+    m_deg = m_n;
     m_x.resize(m_n);
     m_f.resize(m_n);
     m_coef1.resize(m_deg, 0.0);
+    m_coef2.resize(4*(m_n-1), 0.0);
     initGrid();
 }
 double Approximator::getIntegralError() const
 {
-    if (m_n > 50) return -1.0;
+    //if (m_n > 50) return -1.0;
     // Передаём нашу функцию exactFunc = this->f
     return integralError(m_a, m_b, m_n,
                          [this](double x) { return this->f(x); },
@@ -29,7 +31,7 @@ double Approximator::getIntegralError() const
 
 double Approximator::getDiscreteError() const
 {
-    if (m_n > 50) return -1.0;
+    //if (m_n > 50) return -1.0;
     return discreteError(m_x, m_f, m_a, m_b, m_n,
                          [this](double x) { return this->f(x); },
                          GetValue,
@@ -42,6 +44,7 @@ void Approximator::setN(int n)
     m_x.resize(m_n);
     m_f.resize(m_n);
     m_coef1.resize(m_deg, 0.0);
+    m_coef2.resize(4 * (m_n - 1), 0.0);
 }
 
 void Approximator::setK(int k)
@@ -76,11 +79,18 @@ QString Approximator::functionName() const
 void Approximator::initGrid()
 {
     // заполняем m_x и m_f как раньше
-    for (int i = 0; i < m_n; ++i) {
+    for (int i = 0; i < m_n; i++) {
         double t = cos(M_PI * (2.0 * i + 1.0) / (2.0 * m_n));
         m_x[i] = (m_a + m_b) / 2.0 + (m_b - m_a) / 2.0 * t;
         m_f[i] = GetExactValue(m_x[i], m_k);
     }
+    // заполнить вторые производные
+    for(int i=0; i < m_n; i++){
+        double f0dd=SecondDerivative(m_x[0],m_k);
+        double f1dd=SecondDerivative(m_x[(m_n-1)],m_k);
+        m_dd.assign({f0dd, f1dd});
+    }
+
     // запоминаем max|f| исходной функции
     m_maxAbsF = 0.0;
     for (double val : m_f)
@@ -95,16 +105,15 @@ void Approximator::initGrid()
 void Approximator::rebuild()
 {
     initGrid();
-    std::fill(m_coef1.begin(), m_coef1.end(), 0.0);
+    //std::fill(m_coef1.begin(), m_coef1.end(), 0.0);
     GetCoeficients(m_n, m_x, m_f, m_a, m_b, m_coef1, m_deg);
-    // метод 2 пока не реализован
+    GetCoeficients2(m_n, m_x, m_f, m_a, m_b, m_coef2, m_dd);
 }
 
 double Approximator::f(double x) const
 {
     double y = GetExactValue(x, m_k);
     if (m_p != 0 && m_n > 0) {
-        // сравниваем с x_{n/2} с допуском
         y += m_p * 0.1 * m_maxAbsF;
     }
     return y;
@@ -117,8 +126,13 @@ double Approximator::approx1(double x) const
 
 double Approximator::approx2(double x) const
 {
-    // Заглушка: вернуть f(x) или 0
-    return f(x);
+   
+    //debug
+    //for(int i=0; i<4*(m_n-1); i++){
+    //    fprintf(stdout,"coef2[%d]= %lf \n", i, m_coef2[i]);
+    //}
+    //
+    return GetValue2(x, m_x, m_n, m_coef2);
 }
 
 void Approximator::getPlotData(
@@ -165,7 +179,7 @@ void Approximator::getPlotData(
         colors.push_back(color2);
         names.push_back("Approx2");
         break;
-    case 4: // погрешности методов 1 и 2
+    case 4: // Разности истинной фуункции и методов 1 и 2
         funcs.push_back([this](double x){ return this->approx1(x) - this->f(x); });
         colors.push_back(color1);
         names.push_back("Error1");

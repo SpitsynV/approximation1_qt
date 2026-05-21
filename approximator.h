@@ -18,7 +18,7 @@ public:
     // Значения функций в точке x
     double f(double x) const;        // исходная функция
     double approx1(double x) const;  // метод 1 (многочлен)
-    double approx2(double x) const;  // метод 2 (кусочный) – пока заглушка
+    double approx2(double x) const;  // метод 2 (кусочный) 
 
     // Геттеры/сеттеры параметров
     double a() const { return m_a; }
@@ -44,6 +44,8 @@ public:
     // Текстовое представление функции (для вывода в окне)
     QString functionName() const;
 
+    const std::vector<double>& getX() const { return m_x; }
+    const std::vector<double>& getF() const { return m_f; }
     // Получить набор функций для отрисовки в зависимости от graphMode
     // Возвращает список пар (функция, цвет, имя)
     void getPlotData(
@@ -56,15 +58,17 @@ private:
     double m_a, m_b;
     int m_n, m_k;
     int m_p;          // возмущение
-    int m_scale;      // показатель степени для зума (s)
+    int m_scale;      // показатель степени зума (s)
     int m_graphMode;  // 0..4
     double m_maxAbsF; // max|f| до возмущения
     // Сетка и коэффициенты
     std::vector<double> m_x;        // точки приближения (корни Чебышёва)
     std::vector<double> m_f;        // значения функции в этих точках
     std::vector<double> m_coef1;    // коэффициенты метода 1
-    // Для метода 2 пока пусто
     int m_deg;                      // степень многочлена = n-1 (или n)
+    // Для метода 2 
+    std::vector<double> m_coef2;    // коэффициенты метода 2. Их 4(n-1)
+    std::vector<double> m_dd;       // для вторых производных
 
     void initGrid();                // заполнить m_x и m_f
 };
