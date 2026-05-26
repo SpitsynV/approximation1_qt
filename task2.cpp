@@ -40,7 +40,7 @@ double GetValue2(double point, const std::vector<double> &x, int n, const std::v
         val=coef[0]+coef[1]*dx+coef[2]*dx*dx+coef[3]*dx*dx*dx;
         return val;
     }
-    if(point>x[n-1]){
+    if(point>=x[n-1]){
         dx=(point-x[n-2]);
         val=coef[4*(n-2)]+coef[4*(n-2)+1]*dx+coef[4*(n-2)+2]*dx*dx+coef[4*(n-2)+3]*dx*dx*dx;
         return val;

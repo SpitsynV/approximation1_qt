@@ -12,7 +12,7 @@ double weight(double x, double a, double b) {
 double integralError(double a, double b, int n,
                      const std::function<double(double)> &exactFunc,
                      double (*approxFunc)(double, double, double, int, const std::vector<double>&, int),
-                     const std::vector<double> &coef, int deg, int N)
+                     const std::vector<double> &coef, int deg, int N=20000)
 {
     double mid = (a + b) / 2.0;
     double half = (b - a) / 2.0;
