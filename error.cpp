@@ -45,3 +45,18 @@ double discreteError(const std::vector<double> &x,
     }
     return std::sqrt(err);
 }
+double maxAbsoluteError(double a, double b,
+                        const std::function<double(double)> &exactFunc,
+                        const std::function<double(double)> &approxFunc,
+                        int N)
+{
+    double maxErr = 0.0;
+    double step = (b - a) / N;
+    for (int i = 0; i <= N; i++) {
+        double x = a + i * step;
+        double diff = std::abs(exactFunc(x) - approxFunc(x));
+        if (diff > maxErr)
+            maxErr = diff;
+    }
+    return maxErr;
+}

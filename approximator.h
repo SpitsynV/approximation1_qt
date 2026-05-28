@@ -12,6 +12,8 @@ public:
     Approximator(double a, double b, int n, int k);
     double getIntegralError() const;
     double getDiscreteError() const;
+    double getMaxError1() const;
+    double getMaxError2() const;
     // Пересчитать всё при изменении параметров
     void rebuild();
 
@@ -28,6 +30,7 @@ public:
     int p() const { return m_p; }
     int scaleExp() const { return m_scale; }
     int graphMode() const { return m_graphMode; }
+
 
     void setA(double a) { m_a = a; }
     void setB(double b) { m_b = b; }

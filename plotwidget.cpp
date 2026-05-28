@@ -3,7 +3,9 @@
 #include <QKeyEvent>
 #include <cmath>
 #include <cstdio>
-
+#include "func.h"
+#include "task1.h"
+#include "task2.h"
 PlotWidget::PlotWidget(Approximator *approx, QWidget *parent)
     : QWidget(parent), m_approx(approx), m_lastMaxAbs(-1.0)
 {
@@ -109,7 +111,33 @@ void PlotWidget::paintEvent(QPaintEvent * /*event*/)
     if (0.0 >= minY && 0.0 <= maxY) {
         painter.drawLine(l2g(xMin, 0.0), l2g(xMax, 0.0));
     }
+        // === Числовые метки по осям ===
+        // === Числовые метки вдоль осей ===
+    painter.setPen(QPen(Qt::black, 1));
+    QFont tickFont = painter.font();
+    tickFont.setPointSize(8);
+    painter.setFont(tickFont);
+    const int numTicks = 5;
 
+    // Метки оси X (горизонтальная линия y=0)
+    if (0.0 >= minY && 0.0 <= maxY) {
+        for (int i = 0; i <= numTicks; ++i) {
+            double x = xMin + (xMax - xMin) * i / numTicks;
+            QPointF pt = l2g(x, 0.0);
+            painter.drawLine(pt + QPointF(0, -3), pt + QPointF(0, 3));
+            painter.drawText(pt + QPointF(-15, 15), QString::number(x, 'g', 3));
+        }
+    }
+
+    // Метки оси Y (вертикальная линия x=0)
+    if (0.0 >= xMin && 0.0 <= xMax) {
+        for (int i = 0; i <= numTicks; ++i) {
+            double y = minY + (maxY - minY) * i / numTicks;
+            QPointF pt = l2g(0.0, y);
+            painter.drawLine(pt + QPointF(-3, 0), pt + QPointF(3, 0));
+            painter.drawText(pt + QPointF(-50, 4), QString::number(y, 'g', 3));
+        }
+    }
     // Рисуем каждый график
     for (size_t i = 0; i < funcs.size(); ++i) {
         painter.setPen(QPen(colors[i], 2));
@@ -191,6 +219,15 @@ void PlotWidget::keyPressEvent(QKeyEvent *event)
     fprintf(stderr, "=== Debug: n=%d, a=%.6f, b=%.6f ===\n", m_approx->n(), m_approx->a(), m_approx->b());
     for (int i = 0; i < m_approx->n(); ++i) {
         fprintf(stderr, "x[%d] = %12.8f, f[%d] = %12.8f\n", i, x[i], i, f[i]);
+    }
+    fprintf(stderr, "Err1= %e\n",m_approx->getIntegralError());
+    fprintf(stderr, "Max error method 2 = %e\n", m_approx->getMaxError2());
+    /**/
+    for (int i = 0; i < m_approx->n(); ++i) {
+        double exact = m_approx->f(x[i]);      // точное с учётом возмущения
+        double approx2 = m_approx->approx2(x[i]);
+        fprintf(stderr, "x[%d]=%.6f exact=%.6f approx2=%.6f diff=%.2e\n",
+                i, x[i], exact, approx2, exact-approx2);
     }
     // не меняем состояние и не перерисовываем
     return;

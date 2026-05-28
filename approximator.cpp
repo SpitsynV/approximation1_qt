@@ -37,6 +37,21 @@ double Approximator::getDiscreteError() const
                          GetValue,
                          m_coef1, m_deg);
 }
+double Approximator::getMaxError1() const
+{
+    if (m_n > 50) return -1.0;
+    return maxAbsoluteError(m_a, m_b,
+        [this](double x) { return this->f(x); },
+        [this](double x) { return this->approx1(x); });
+}
+
+double Approximator::getMaxError2() const
+{
+    if (m_n < 2) return -1.0;
+    return maxAbsoluteError(m_a, m_b,
+        [this](double x) { return this->f(x); },
+        [this](double x) { return this->approx2(x); });
+}
 void Approximator::setN(int n)
 {
     m_n = n;
@@ -85,11 +100,10 @@ void Approximator::initGrid()
         m_f[i] = GetExactValue(m_x[i], m_k);
     }
     // заполнить вторые производные
-    for(int i=0; i < m_n; i++){
         double f0dd=SecondDerivative(m_x[0],m_k);
         double f1dd=SecondDerivative(m_x[(m_n-1)],m_k);
         m_dd.assign({f0dd, f1dd});
-    }
+    
 
     // запоминаем max|f| исходной функции
     m_maxAbsF = 0.0;
@@ -104,6 +118,11 @@ void Approximator::initGrid()
 
 void Approximator::rebuild()
 {
+    m_deg=std::min(m_n,50);
+    m_x.resize(m_n);
+    m_f.resize(m_n);
+    m_coef1.resize(m_deg, 0.0);
+    m_coef2.resize(4*(m_n-1), 0.0);
     initGrid();
     //std::fill(m_coef1.begin(), m_coef1.end(), 0.0);
     GetCoeficients(m_n, m_x, m_f, m_a, m_b, m_coef1, m_deg);
@@ -120,7 +139,7 @@ double Approximator::f(double x) const
 }
 double Approximator::approx1(double x) const
 {
-    //if (m_n > 50) return 0.0; // требование задания
+    if (m_n > 50) return 0.0; // требование задания
     return GetValue(x, m_a, m_b, m_n, m_coef1, m_deg);
 }
 
