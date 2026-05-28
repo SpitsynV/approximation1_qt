@@ -35,20 +35,16 @@ double GetValue2(double point, const std::vector<double> &x, int n, const std::v
 {
     double dx=0;
     double val=0;
-    if(point<x[0]){
-        dx=(point-x[0]);
-        val=coef[0]+coef[1]*dx+coef[2]*dx*dx+coef[3]*dx*dx*dx;
-        return val;
+    int i;
+    if (point <= x[0]) {
+        i = 0;                      // точка совпадает с x[0] — первый интервал
+    } else if (point >= x[n-1]) {
+        i = n - 2;                  // точка совпадает с x[n-1] — последний интервал
+    } else {
+        auto it = std::upper_bound(x.begin(), x.end(), point);
+        i = std::distance(x.begin(), it) - 1;
     }
-    if(point>=x[n-1]){
-        dx=(point-x[n-2]);
-        val=coef[4*(n-2)]+coef[4*(n-2)+1]*dx+coef[4*(n-2)+2]*dx*dx+coef[4*(n-2)+3]*dx*dx*dx;
-        return val;
-    }
-    //бин поиск нужного интервала
-    auto it = std::upper_bound(x.begin(), x.end(), point);
-    int i = std::distance(x.begin(), it) -1;
-    dx=(point-x[i]);
-    val=coef[4*i]+coef[4*i+1]*dx+coef[4*i+2]*dx*dx+coef[4*i+3]*dx*dx*dx;
-    return val;
+
+    dx = point - x[i];
+    return coef[4*i] + coef[4*i+1]*dx + coef[4*i+2]*dx*dx + coef[4*i+3]*dx*dx*dx;
 }

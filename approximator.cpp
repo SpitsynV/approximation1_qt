@@ -37,18 +37,18 @@ double Approximator::getDiscreteError() const
                          GetValue,
                          m_coef1, m_deg);
 }
-double Approximator::getMaxError1() const
+/*double Approximator::getMaxError1() const
 {
     if (m_n > 50) return -1.0;
     return maxAbsoluteError(m_a, m_b,
         [this](double x) { return this->f(x); },
         [this](double x) { return this->approx1(x); });
 }
-
+*/
 double Approximator::getMaxError2() const
 {
     if (m_n < 2) return -1.0;
-    return maxAbsoluteError(m_a, m_b,
+    return maxAbsoluteError(m_x[0], m_x[m_n-1],
         [this](double x) { return this->f(x); },
         [this](double x) { return this->approx2(x); });
 }
@@ -99,6 +99,8 @@ void Approximator::initGrid()
         m_x[i] = (m_a + m_b) / 2.0 + (m_b - m_a) / 2.0 * t;
         m_f[i] = GetExactValue(m_x[i], m_k);
     }
+    std::reverse(m_x.begin(), m_x.end());
+    std::reverse(m_f.begin(), m_f.end());
     // заполнить вторые производные
         double f0dd=SecondDerivative(m_x[0],m_k);
         double f1dd=SecondDerivative(m_x[(m_n-1)],m_k);
