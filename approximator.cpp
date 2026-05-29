@@ -21,8 +21,8 @@ Approximator::Approximator(double a, double b, int n, int k)
 }
 double Approximator::getIntegralError() const
 {
-    //if (m_n > 50) return -1.0;
-    // Передаём нашу функцию exactFunc = this->f
+    if (m_n > 50) return -1.0;
+    // Передаём нашу функцию с возмущением = this->f
     return integralError(m_a, m_b, m_n,
                          [this](double x) { return this->f(x); },
                          GetValue,
@@ -31,7 +31,7 @@ double Approximator::getIntegralError() const
 
 double Approximator::getDiscreteError() const
 {
-    //if (m_n > 50) return -1.0;
+    if (m_n > 50) return -1.0;
     return discreteError(m_x, m_f, m_a, m_b, m_n,
                          [this](double x) { return this->f(x); },
                          GetValue,
@@ -95,12 +95,12 @@ void Approximator::initGrid()
 {
     // заполняем m_x и m_f как раньше
     for (int i = 0; i < m_n; i++) {
-        double t = cos(M_PI * (2.0 * i + 1.0) / (2.0 * m_n));
+        double t = cos(M_PI * (2.0 * (m_n - 1 - i) + 1.0) / (2.0 * m_n));
         m_x[i] = (m_a + m_b) / 2.0 + (m_b - m_a) / 2.0 * t;
         m_f[i] = GetExactValue(m_x[i], m_k);
     }
-    std::reverse(m_x.begin(), m_x.end());
-    std::reverse(m_f.begin(), m_f.end());
+    //std::reverse(m_x.begin(), m_x.end());
+    //std::reverse(m_f.begin(), m_f.end());
     // заполнить вторые производные
         double f0dd=SecondDerivative(m_x[0],m_k);
         double f1dd=SecondDerivative(m_x[(m_n-1)],m_k);
@@ -127,7 +127,7 @@ void Approximator::rebuild()
     m_coef2.resize(4*(m_n-1), 0.0);
     initGrid();
     //std::fill(m_coef1.begin(), m_coef1.end(), 0.0);
-    GetCoeficients(m_n, m_x, m_f, m_a, m_b, m_coef1, m_deg);
+    if(m_n<=50) GetCoeficients(m_n, m_x, m_f, m_a, m_b, m_coef1, m_deg);
     GetCoeficients2(m_n, m_x, m_f, m_a, m_b, m_coef2, m_dd);
 }
 

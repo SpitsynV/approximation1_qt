@@ -217,18 +217,21 @@ void PlotWidget::keyPressEvent(QKeyEvent *event)
     const auto &x = m_approx->getX();
     const auto &f = m_approx->getF();
     fprintf(stderr, "=== Debug: n=%d, a=%.6f, b=%.6f ===\n", m_approx->n(), m_approx->a(), m_approx->b());
+    /*
     for (int i = 0; i < m_approx->n(); ++i) {
         fprintf(stderr, "x[%d] = %12.8f, f[%d] = %12.8f\n", i, x[i], i, f[i]);
     }
+        */
     fprintf(stderr, "Err1= %e\n",m_approx->getIntegralError());
     fprintf(stderr, "Max error method 2 = %e\n", m_approx->getMaxError2());
-    /**/
+    /*
     for (int i = 0; i < m_approx->n(); ++i) {
         double exact = m_approx->f(x[i]);      // точное с учётом возмущения
         double approx2 = m_approx->approx2(x[i]);
         fprintf(stderr, "x[%d]=%.6f exact=%.6f approx2=%.6f diff=%.2e\n",
                 i, x[i], exact, approx2, exact-approx2);
     }
+    */
     // не меняем состояние и не перерисовываем
     return;
     }
@@ -281,9 +284,13 @@ void PlotWidget::keyPressEvent(QKeyEvent *event)
 
     if (needRebuild)
         m_approx->rebuild();
+        /*
         double errInt = m_approx->getIntegralError();
         double errDisc = m_approx->getDiscreteError();
+        double errMax= m_approx->getMaxError2();
         fprintf(stderr, "Integral error = %e, Discrete error = %e\n", errInt, errDisc);
+        fprintf(stderr, "Max error = %e\n",errMax);
+        */
     if (needUpdate)
         update();
 }

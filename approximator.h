@@ -12,7 +12,7 @@ public:
     Approximator(double a, double b, int n, int k);
     double getIntegralError() const;
     double getDiscreteError() const;
-    double getMaxError1() const;
+    //double getMaxError1() const;
     double getMaxError2() const;
     // Пересчитать всё при изменении параметров
     void rebuild();
