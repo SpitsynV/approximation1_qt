@@ -135,7 +135,11 @@ double Approximator::f(double x) const
 {
     double y = GetExactValue(x, m_k);
     if (m_p != 0 && m_n > 0) {
-        y += m_p * 0.1 * m_maxAbsF;
+        int mid = m_n / 2;
+        // Сравнение с x_mid с учётом погрешности
+        if (std::abs(x - m_x[mid]) < 1e-12 * std::max(1.0, std::abs(x))) {
+            y += m_p * 0.1 * m_maxAbsF;
+        }
     }
     return y;
 }
