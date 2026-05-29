@@ -6,7 +6,6 @@
 
 int main(int argc, char *argv[])
 {
-    // Обязательные параметры командной строки
     if (argc < 5) {
         std::cerr << "Usage: " << argv[0] << " a b n k" << std::endl;
         return EXIT_FAILURE;

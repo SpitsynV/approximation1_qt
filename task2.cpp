@@ -30,7 +30,7 @@ void GetCoeficients2(int n, const std::vector<double> &x, const std::vector<doub
 
 }
 
-//Не дает точного приближения даже для x^2. Это метод такой. Квадратичная погрешность
+//Не дает точного приближения даже для x^2. Это метод такой.
 double GetValue2(double point, const std::vector<double> &x, int n, const std::vector<double> &coef)
 {
     double dx=0;

@@ -46,8 +46,7 @@ void PlotWidget::paintEvent(QPaintEvent * /*event*/)
     double xMin = mid - halfLen;
     double xMax = mid + halfLen;
 
-    // Шаг по X для оценки min/max и рисования: используем ширину виджета
-    int steps = width(); // по числу пикселей по горизонтали
+    int steps = width();
     if (steps < 2) steps = 2;
     double dx = (xMax - xMin) / (steps - 1);
 
@@ -68,19 +67,18 @@ void PlotWidget::paintEvent(QPaintEvent * /*event*/)
             }
         }
     }
-    if (first) return; // нет конечных значений
+    if (first) return;
         // Реальные min/max функций (до отступов)
     double realMin = minY;
     double realMax = maxY;
 
-    // Вычисляем maxAbs по заданию (максимум модуля среди реальных min/max)
+    //максимум модуля среди реальных min/max
     double maxAbs = std::max(std::abs(realMin), std::abs(realMax));
 
-    // Добавляем отступы, чтобы график не прилипал к краям
+    // Отступы
     double delta = realMax - realMin;
     double margin;
     if (delta < 1e-12) {
-        // Константная функция – отступ 10% от абсолютного значения, но не меньше 0.1
         margin = 0.1 * std::max(1.0, std::abs(realMax));
     } else {
         margin = 0.05 * delta; // 5% от диапазона
@@ -101,25 +99,22 @@ void PlotWidget::paintEvent(QPaintEvent * /*event*/)
         return QPointF(px, py);
     };
 
-    // Рисуем сетку (оси)
+    // Оси
     painter.setPen(QPen(Qt::gray, 1));
-    // Ось Y (x=0), если попадает в диапазон
     if (0.0 >= xMin && 0.0 <= xMax) {
         painter.drawLine(l2g(0.0, minY), l2g(0.0, maxY));
     }
-    // Ось X (y=0)
     if (0.0 >= minY && 0.0 <= maxY) {
         painter.drawLine(l2g(xMin, 0.0), l2g(xMax, 0.0));
     }
         // === Числовые метки по осям ===
-        // === Числовые метки вдоль осей ===
     painter.setPen(QPen(Qt::black, 1));
     QFont tickFont = painter.font();
     tickFont.setPointSize(8);
     painter.setFont(tickFont);
     const int numTicks = 5;
 
-    // Метки оси X (горизонтальная линия y=0)
+    // Метки оси X
     if (0.0 >= minY && 0.0 <= maxY) {
         for (int i = 0; i <= numTicks; ++i) {
             double x = xMin + (xMax - xMin) * i / numTicks;
@@ -129,7 +124,7 @@ void PlotWidget::paintEvent(QPaintEvent * /*event*/)
         }
     }
 
-    // Метки оси Y (вертикальная линия x=0)
+    // Метки оси Y
     if (0.0 >= xMin && 0.0 <= xMax) {
         for (int i = 0; i <= numTicks; ++i) {
             double y = minY + (maxY - minY) * i / numTicks;
@@ -175,7 +170,6 @@ void PlotWidget::paintEvent(QPaintEvent * /*event*/)
     painter.setFont(legendFont);
     QFontMetrics fm(legendFont);
 
-    // Вычисляем ширину самой длинной подписи, чтобы разместить легенду справа
     int maxTextWidth = 0;
     for (const auto &name : names) {
         int w = fm.horizontalAdvance(name);

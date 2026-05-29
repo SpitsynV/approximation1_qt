@@ -17,16 +17,13 @@ void GetCoeficients(int n, const std::vector<double>& x, const std::vector<doubl
         return t1;
     };
 
-    // Преобразуем x в t ∈ [-1, 1]
     std::vector<double> t(n);
     for (int i = 0; i < n; ++i) {
         t[i] = (2.0 * x[i] - (a + b)) / (b - a);
     }
 
-    // Обнуляем коэффициенты
     std::fill(coef.begin(), coef.end(), 0.0);
 
-    // Суммируем по узлам
     for (int j = 0; j < n; ++j) {
         for (int k = 0; k < deg; ++k) {
             coef[k] += f[j] * chebyshevT(k, t[j]);
@@ -59,4 +56,3 @@ double GetValue(double point, double a, double b, int n,const std::vector<double
     }
     return value;
 }
-///странно что второй и последний коэфициенты всегда нулевые
